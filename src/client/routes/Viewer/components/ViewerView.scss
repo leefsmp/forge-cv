@@ -1,0 +1,46 @@
+.viewer-view {
+  height: calc(100vh - 65px);
+  background-color: #dadada;
+  position: relative;
+  width: 100vw;
+
+  .adsk-viewing-viewer.light-theme .adsk-button:hover {
+    border: 1px solid orange;
+    color: orange;
+  }
+
+  .adsk-viewing-viewer.light-theme .adsk-button.active {
+    border: 1px solid orange;
+    color:orange;
+  }
+
+  .docking-panel {
+    text-align: left;
+  
+    .docking-panel-close {
+      top: -6px;
+    }
+  }
+}
+
+.opencv-toolbar {
+  position: absolute;
+  bottom: 100px;
+  right: 105px;
+}
+
+.opencv-toolbar #toolbar-markup3D .adsk-control-tooltip {
+  transform: translate(-65px, 25px);
+}
+
+.opencv-toolbar #toolbar-transform .adsk-control-tooltip {
+  transform: translate(-140px, 20px);
+}
+
+.opencv-toolbar #toolbar-translate .adsk-control-tooltip {
+  transform: translate(-125px, -20px);
+}
+
+.opencv-toolbar #toolbar-rotate .adsk-control-tooltip {
+  transform: translate(-115px, -15px);
+}
