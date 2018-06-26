@@ -13,9 +13,12 @@ export default class SocketSvc extends BaseSvc {
 
     super (config)
 
-    this._connections = {}
+    this.handleDisconnection = this.handleDisconnection.bind(this)
+    this.handleConnection = this.handleConnection.bind(this)
 
     this._io = io(config.server)
+
+    this._connections = {}
 
     this._io.sockets.on(
       'connection',
@@ -35,7 +38,6 @@ export default class SocketSvc extends BaseSvc {
   // Socket Connection handler
   //
   ///////////////////////////////////////////////////////////////////
-  @autobind
   handleConnection (socket) {
 
     var _thisSvc = this
@@ -64,7 +66,7 @@ export default class SocketSvc extends BaseSvc {
       _thisSvc.broadcast(data.msgId, data.msg, filter)
     })
 
-    _thisSvc.emit('SocketSvc.Connection', {
+    _thisSvc.emit('connect', {
       id: socket.id
     })
 
@@ -75,12 +77,11 @@ export default class SocketSvc extends BaseSvc {
   // Socket Disconnection handler
   //
   ///////////////////////////////////////////////////////////////////
-  @autobind
   handleDisconnection (id) {
 
     var _thisSvc = this
 
-    _thisSvc.emit('SocketSvc.Disconnection', {
+    _thisSvc.emit('disconnect', {
       id: id
     })
 

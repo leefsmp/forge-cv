@@ -13,23 +13,17 @@ import util from 'util'
 import path from 'path'
 
 //Endpoints
-import DerivativesAPI from './api/endpoints/derivatives'
 import SocketAPI from './api/endpoints/socket'
 import OpenCVAPI from './api/endpoints/opencv'
 import ForgeAPI from './api/endpoints/forge'
-import OssAPI from './api/endpoints/oss'
-import DMAPI from './api/endpoints/dm'
 
 //Services
-import DerivativesSvc from './api/services/DerivativesSvc'
 import ServiceManager from './api/services/SvcManager'
-import ExtractorSvc from './api/services/ExtractorSvc'
 import LMVProxySvc from './api/services/LMVProxySvc'
 import SocketSvc from './api/services/SocketSvc'
 import ViewerSvc from './api/services/ViewerSvc'
 import ForgeSvc from './api/services/ForgeSvc'
 import FileSvc from './api/services/FileSvc'
-import OssSvc from './api/services/OssSvc'
 
 //Config (NODE_ENV dependant)
 import config from'c0nfig'
@@ -78,13 +72,6 @@ app.use(helmet())
 // Services setup
 //
 ///////////////////////////////////////////////////////////
-const derivativesSvc = new DerivativesSvc()
-
-const lmvProxySvc = new LMVProxySvc({
-  endpoint: config.forge.oauth.baseUri.replace(
-    'https://', '')
-})
-
 const forgeSvc = new ForgeSvc(
   config.forge)
 
@@ -92,23 +79,16 @@ const fileSvc = new FileSvc({
   tempStorage: path.join(__dirname, '/../../TMP')
 })
 
-const extractorSvc = new ExtractorSvc()
-
 const viewerSvc = new ViewerSvc()
-const ossSvc = new OssSvc()
 
-ServiceManager.registerService(derivativesSvc)
-ServiceManager.registerService(extractorSvc)
 ServiceManager.registerService(viewerSvc)
 ServiceManager.registerService(forgeSvc)
 ServiceManager.registerService(fileSvc)
-ServiceManager.registerService(ossSvc)
 
 ///////////////////////////////////////////////////////////
 // API Routes setup - Disabled except socket by default
 //
 ///////////////////////////////////////////////////////////
-app.use('/api/opencv', OpenCVAPI())
 app.use('/api/socket', SocketAPI())
 app.use('/api/forge', ForgeAPI())
 
@@ -116,6 +96,11 @@ app.use('/api/forge', ForgeAPI())
 // Viewer GET Proxy
 //
 ///////////////////////////////////////////////////////////
+const lmvProxySvc = new LMVProxySvc({
+  endpoint: config.forge.oauth.baseUri.replace(
+    'https://', '')
+})
+
 const proxy2legged = lmvProxySvc.generateProxy(
   'lmv-proxy-2legged',
   () => forgeSvc.get2LeggedToken())
@@ -207,6 +192,8 @@ function runServer(app) {
         })
 
         ServiceManager.registerService(socketSvc)
+
+        app.use('/api/opencv', OpenCVAPI())
 
         console.log('Server listening on: ')
         console.log(server.address())

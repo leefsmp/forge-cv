@@ -1,13 +1,22 @@
 import { connect } from 'react-redux'
+
 import CoreLayout from './CoreLayout'
+
 import {
-  saveAppState,
-  setUser
+  saveAppState
   } from '../../store/app'
 
+import {
+  removeNotifications,
+  updateNotification,
+  addNotification
+  } from 'reapop'
+
 const mapDispatchToProps = {
-  saveAppState,
-  setUser
+  removeNotifications,
+  updateNotification,
+  addNotification,
+  saveAppState
 }
 
 const mapStateToProps = (state) => ({

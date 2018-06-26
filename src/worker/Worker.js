@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer'
-import BaseSvc from './BaseSvc'
 import pathUtils from 'path'
 import cv from 'opencv'
 import fs from 'fs'
@@ -116,7 +115,9 @@ const guid = (format='xxxxxxxxxxxx') => {
   return guid
 }
 
-export default class ViewerSvc extends BaseSvc {
+
+
+export default class Worker {
 
   /////////////////////////////////////////////////////////
   //
@@ -124,123 +125,137 @@ export default class ViewerSvc extends BaseSvc {
   /////////////////////////////////////////////////////////
   constructor (config) {
 
-    super (config)
+    this.sendMessage = this.sendMessage.bind(this)
 
-    this._instances = {}
+    this.pid = process.pid
   }
 
   /////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////
-  name() {
+  sendMessage (msg) {
 
-    return 'ViewerSvc'
+    process.send(msg)
   }
 
   /////////////////////////////////////////////////////////
   //
   //
   /////////////////////////////////////////////////////////
-  load (instanceId, accessToken, urn) {
+  terminate () {
 
-    return new Promise(async(resolve, reject) => {
+    if (this.browser) {
 
-      const browser = await puppeteer.launch({
-        headless: false,
-        args: [
-          '--hide-scrollbars',
-          '--mute-audio',
-          '--headless'
-        ]
+      this.browser.close()
+    }
+  }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  async load (accessToken, urn) {
+
+    const browser = await puppeteer.launch({
+      headless: false,
+      args: [
+        '--hide-scrollbars',
+        '--mute-audio',
+        '--headless'
+      ]
+    })
+
+    try {
+  
+      const filename = pathUtils.resolve(
+        __dirname, '../..',
+        './resources/viewer/viewer.html')
+  
+      const url = `file://${filename}?accessToken=${accessToken}&urn=${urn}`
+      
+      const page = await browser.newPage()
+
+      await page.goto(url)
+
+      await page.mainFrame().waitForSelector(
+        '.geometry-loaded', {
+          timeout: 300000
+        })
+      
+      this.browser = browser
+      this.page = page
+
+      this.sendMessage({
+        data: 'loaded',
+        status: 200,
+        id: 'load'
+      })
+    
+    } catch (ex) {
+  
+      browser.close()
+
+      this.sendMessage({
+        status: 500,
+        id: 'load',
+        data: ex
+      })
+    } 
+  }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  async getOBB (state, size) {
+
+    try {
+  
+      await setState(this.page, state)
+
+      const path = pathUtils.resolve(
+        __dirname, '../..',
+        `./TMP/${guid()}.jpg`)  
+
+      const clip  = {
+        height: size.height,  
+        width: size.width,  
+        x: 0,
+        y: 0,
+      }  
+
+      await this.page.setViewport(size)
+
+      await this.page.screenshot({
+        path,
+        clip
       })
 
-      try {
-    
-        const filename = pathUtils.resolve(
-          __dirname, '../../../..',
-          './resources/viewer/viewer.html')
-    
-        const url = `file://${filename}?accessToken=${accessToken}&urn=${urn}`
-        
-        const page = await browser.newPage()
+      const img = await loadImage(path)
 
-        await page.goto(url)
+      const obb = getOBB (img)
 
-        await page.mainFrame().waitForSelector(
-          '.geometry-loaded', {
-            timeout: 300000
-          })
-        
-        this._instances[instanceId] = {
-          browser,
-          page
-        }
+      const p1 = await clientToWorld(this.page, obb.points[0])
+      const p2 = await clientToWorld(this.page, obb.points[1])
+      const p3 = await clientToWorld(this.page, obb.points[2])
+      const p4 = await clientToWorld(this.page, obb.points[3])
 
-        resolve()
-      
-      } catch (ex) {
-    
-        browser.close()
+      fs.unlink(path, (error) => {}) 
 
-        reject (ex)
-      } 
-    })
-  }
+      this.sendMessage({
+        data: [p1, p2, p3, p4],
+        status: 200,
+        id: 'obb'
+      })
 
-  /////////////////////////////////////////////////////////
-  //
-  //
-  /////////////////////////////////////////////////////////
-  getOBB (instanceId, {state, size}) {
+    } catch (ex) {
 
-   return new Promise(async(resolve, reject) => {
-
-      try {
-    
-        if(!this._instances[instanceId]) {
-          return reject('Invalid instanceId')
-        }
-
-        const {page} = this._instances[instanceId]
-
-        await setState(page, state)
-
-        const path = pathUtils.resolve(
-          __dirname, '../../../..',
-          `./TMP/${guid()}.jpg`)  
-
-        const clip  = {
-          height: size.height,  
-          width: size.width,  
-          x: 0,
-          y: 0,
-        }  
-
-        await page.setViewport(size)
-
-        await page.screenshot({
-          path,
-          clip
-        })
-
-        const img = await loadImage(path)
-
-        const obb = getOBB (img)
-
-        const p1 = await clientToWorld(page, obb.points[0])
-        const p2 = await clientToWorld(page, obb.points[1])
-        const p3 = await clientToWorld(page, obb.points[2])
-        const p4 = await clientToWorld(page, obb.points[3])
-
-        fs.unlink(path, (error) => {}) 
-
-        resolve ([p1, p2, p3, p4])
-      
-      } catch (ex) {
-    
-        reject (ex)
-      } 
-    })
+      this.sendMessage({
+        status: 500,
+        id: 'obb',
+        data: ex
+      })
+    } 
   }
 }

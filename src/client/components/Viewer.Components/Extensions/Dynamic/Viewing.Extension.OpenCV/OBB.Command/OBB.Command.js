@@ -71,6 +71,14 @@ export default class OBBCommand extends ViewerCommand {
       this.tooltip.deactivate()
     })
 
+    this.commandTool.on('keydown', (event, keyCode) => {
+
+      if (keyCode === 27) {
+
+        this.commandTool.deactivate()
+      }
+    })
+
     this.commandTool.on('singleclick', this.onClick)
 
     this.materialLine = new THREE.LineBasicMaterial({
@@ -90,12 +98,15 @@ export default class OBBCommand extends ViewerCommand {
       this.materialLine,
       camera)
 
-    this.tooltip = new ViewerTooltip(viewer)
+    this.tooltip = new ViewerTooltip(viewer, {
+      stroke: 'blue',
+      fill: 'blue'
+    })
 
     this.tooltip.setContent(`
-      <div id="markup3D-tooltipId" class="markup3D-tooltip">
-        <b>Place new markup (or ESC) ...</b>
-      </div>`, '#markup3D-tooltipId')
+      <div id="obb-tooltipId" class="obb-tooltip">
+        <b>Select model ...</b>
+      </div>`, '#obb-tooltipId')
   }
 
   /////////////////////////////////////////////////////////
@@ -142,59 +153,75 @@ export default class OBBCommand extends ViewerCommand {
   /////////////////////////////////////////////////////////
   async onClick (event) {
 
-    const rect = this.viewer.impl.canvas.getBoundingClientRect()
+    const defaultCursor = this.viewer.impl.canvas.style.cursor 
 
-    const state = this.viewer.getState({
-      viewport: true
-    })
+    try {
 
-    const size = {
-      height: rect.height,
-      width: rect.width
-    }
+      if (this.lines) {
 
-    const points3d = await this.openCVSvc.getOBB(
-      this.options.socketId, {
-        state, size
-      })
-
-    const points2d = points3d.map((point3d) => {
-      return this.viewer.worldToClient(point3d)
-    })
-
-    const lineGeometry = new THREE.Geometry()
-
-    lineGeometry.vertices.push(
-      new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
-    lineGeometry.vertices.push(
-      new THREE.Vector3(points2d[1].x, points2d[1].y, -10))
-    lineGeometry.vertices.push(
-      new THREE.Vector3(points2d[2].x, points2d[2].y, -10))    
-    lineGeometry.vertices.push(
-      new THREE.Vector3(points2d[3].x, points2d[3].y, -10))    
-    lineGeometry.vertices.push(
-      new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
-
-
-    if (this.lines) {
-
-      this.viewer.impl.removeOverlay(
-        'obb-overlay',
-        this.lines)
-      
+        this.viewer.impl.removeOverlay(
+          'obb-overlay',
+          this.lines)
+        
         this.lines = null
-    }  
+      }  
   
-    this.lines = new THREE.Line(
-      lineGeometry,
-      this.materialLine,
-      THREE.LineStrip)
+      const hitTest = this.viewer.clientToWorld(
+        event.canvasX, event.canvasY, true)
+  
+      if (hitTest) {
+        
+        const rect = this.viewer.impl.canvas.getBoundingClientRect()
+  
+        const state = this.viewer.getState({
+          viewport: true
+        })
+  
+        const size = {
+          height: rect.height,
+          width: rect.width
+        }
+  
+        this.viewer.impl.canvas.style.cursor = 'wait'
+  
+        const points3d = await this.openCVSvc.getOBB(
+          this.options.socketId, {
+            state, size
+          })
+  
+        const points2d = points3d.map((point3d) => {
+          return this.viewer.worldToClient(point3d)
+        })
+  
+        const lineGeometry = new THREE.Geometry()
+  
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[1].x, points2d[1].y, -10))
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[2].x, points2d[2].y, -10))    
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[3].x, points2d[3].y, -10))    
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
+  
+        this.lines = new THREE.Line(
+          lineGeometry,
+          this.materialLine,
+          THREE.LineStrip)
+  
+        this.viewer.impl.addOverlay(
+          'obb-overlay',
+          this.lines)
+    
+        this.viewer.impl.invalidate(false, false, true)
+      }
 
-    this.viewer.impl.addOverlay(
-      'obb-overlay',
-      this.lines)
-  
-    this.viewer.impl.invalidate(false, false, true)
+    } finally {
+
+      this.viewer.impl.canvas.style.cursor = defaultCursor
+    }
   }
 }
 

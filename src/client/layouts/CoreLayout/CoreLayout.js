@@ -1,7 +1,10 @@
+import autobind from 'autobind-decorator'
+import NotificationsSystem from 'reapop'
 import ServiceManager from 'SvcManager'
+import theme from 'reapop-theme-custom'
+import PropTypes from 'prop-types'
 import 'Dialogs/dialogs.scss'
 import Header from 'Header'
-import 'forge-white.scss'
 import React from 'react'
 import 'core.scss'
 
@@ -12,7 +15,16 @@ class CoreLayout extends React.Component {
   //
   /////////////////////////////////////////////////////////
   static propTypes = {
-    children : React.PropTypes.element.isRequired
+    children : PropTypes.element.isRequired
+  }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  constructor (props) {
+
+    super(props)
   }
 
   /////////////////////////////////////////////////////////
@@ -21,9 +33,33 @@ class CoreLayout extends React.Component {
   /////////////////////////////////////////////////////////
   componentWillMount () {
 
-    this.forgeSvc =
+    this.notifySvc =
       ServiceManager.getService(
-        'ForgeSvc')
+        'NotifySvc')
+
+    this.notifySvc.initialize ({
+      remove: this.props.removeNotifications,
+      update: this.props.updateNotification,
+      add: this.props.addNotification
+    })
+
+    this.socketSvc =
+      ServiceManager.getService(
+        'SocketSvc')
+
+    this.dialogSvc =
+      ServiceManager.getService(
+        'DialogSvc')
+
+    this.dialogSvc.setComponent(this)
+  }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  componentWillUnmount () {
+
   }
 
   /////////////////////////////////////////////////////////
@@ -32,14 +68,16 @@ class CoreLayout extends React.Component {
   /////////////////////////////////////////////////////////
   render () {
 
-    const { children } = this.props
-
     return (
-      <div className='container text-center'>
-        <Header {...this.props}/>
-        <div className='core-layout'>
-          {children}
+      <div className='container'>
+        <div className='notifications'>
+          <NotificationsSystem theme={theme}/>
         </div>
+        <Header {...this.props} />
+        <div className='core-layout__viewport'>
+          {this.props.children}
+        </div>
+        { this.dialogSvc.render() }
       </div>
     )
   }

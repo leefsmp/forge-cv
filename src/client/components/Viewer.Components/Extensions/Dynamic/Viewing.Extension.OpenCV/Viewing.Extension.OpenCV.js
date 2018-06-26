@@ -16,6 +16,8 @@ export default class OpenCVExtension
     this.openCVSvc = ServiceManager.getService('OpenCVSvc')
 
     this.socketSvc = ServiceManager.getService('SocketSvc')
+
+    this.notifySvc = ServiceManager.getService('NotifySvc') 
   }
 
   /////////////////////////////////////////////////////////
@@ -24,9 +26,21 @@ export default class OpenCVExtension
   /////////////////////////////////////////////////////////
   load () {
 
+    const notification = this.notifySvc.add({
+      title: 'Initializing OpenCV',
+      message: 'Please wait ...',
+      dismissible: false,
+      status: 'loading',
+      id: 'opencv-init',
+      dismissAfter: 0,
+      position: 'tl'
+    })
+
+    this.notifySvc.update(notification)
+
     this.socketSvc.getSocketId().then (async(socketId) => {
 
-      await this.openCVSvc.load({
+      const res = await this.openCVSvc.load({
         urn: this.options.urn,
         socketId
       })
@@ -36,6 +50,13 @@ export default class OpenCVExtension
         openCVSvc: this.openCVSvc,
         socketId
       })
+
+      notification.title = 'OpenCV initialized !'
+      notification.dismissAfter = 2000
+      notification.status = 'success'
+      notification.message = ''
+
+      this.notifySvc.update(notification)
     })
     
     return true

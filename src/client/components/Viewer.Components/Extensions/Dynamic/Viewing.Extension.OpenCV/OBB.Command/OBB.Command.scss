@@ -6,3 +6,24 @@
   width: 24px;
 }
 
+.obb-tooltip {
+  transition-timing-function: ease;
+  transition-property: opacity;
+  transition-duration: 1.0s;
+  transition-delay: 0.0s;
+
+  position: absolute;
+  font-weight: bold;
+  overflow: hidden;
+  color: blue;
+  display: none;
+  height: 20px;
+  opacity: 0;
+}
+
+.tooltip-text {
+  background-color: #ededed !important;
+  border: 1px solid grey;
+  color: grey !important;
+  padding: 4px;
+}

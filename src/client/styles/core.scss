@@ -85,3 +85,34 @@ body {
   z-index: 1;
   width: 4px;
 }
+
+///////////////////////////////////////////////////////////
+// content editable placeholder
+//
+///////////////////////////////////////////////////////////
+*[contenteditable] {
+  user-select: auto !important;
+}
+
+[contenteditable]:empty:not(:focus):before {
+  content: attr(data-placeholder);
+  pointer-events: none;
+  color: darkgrey;
+}
+
+[contenteditable]:focus {
+  outline: none;
+}
+
+[contenteditable][disabled] {
+  background: #f7f6f6;
+  color: #949494;
+}
+
+///////////////////////////////////////////////////////////
+// disabled controls
+///////////////////////////////////////////////////////////
+button[disabled],
+div[disabled] {
+  cursor: not-allowed !important;
+}

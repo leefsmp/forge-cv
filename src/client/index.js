@@ -1,68 +1,10 @@
 import AppContainer from './containers/AppContainer'
-import createStore from './store/createStore'
 import ReactDOM from 'react-dom'
 import 'font-awesome-webpack'
+import store from './store'
 import config from 'c0nfig'
 import 'bootstrap-webpack'
 import React from 'react'
-
-//Services
-import ServiceManager from 'SvcManager'
-import StorageSvc from 'StorageSvc'
-import OpenCVSvc from 'OpenCVSvc'
-import SocketSvc from 'SocketSvc'
-import EventSvc from 'EventSvc'
-import ForgeSvc from 'ForgeSvc'
-
-// ========================================================
-// Services Initialization
-// ========================================================
-
-const storageSvc = new StorageSvc({
-  storageKey: 'Autodesk.Forge.Storage'
-})
-
-const socketSvc = new SocketSvc({
-  host: config.client.host,
-  port: config.client.port
-})
-
-socketSvc.connect().then((socket) => {
-
-  console.log('client socket connected')
-
-}, (error) => {
-
-  console.log('error connecting client socket ...')
-  console.log(error)
-})
-
-const eventSvc = new EventSvc()
-
-const forgeSvc = new ForgeSvc({
-  apiUrl: '/api/forge'
-})
-
-const openCVSvc = new OpenCVSvc({
-  apiUrl: '/api/opencv'
-})
-
-// ========================================================
-// Services Registration
-// ========================================================
-ServiceManager.registerService(storageSvc)
-ServiceManager.registerService(socketSvc)
-ServiceManager.registerService(openCVSvc)
-ServiceManager.registerService(eventSvc)
-ServiceManager.registerService(forgeSvc)
-
-// ========================================================
-// Store Instantiation
-// ========================================================
-const initialState = window.___INITIAL_STATE__
-
-const store = createStore(initialState)
-
 
 // ========================================================
 // Render Setup
