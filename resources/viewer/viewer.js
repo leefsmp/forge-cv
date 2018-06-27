@@ -135,6 +135,8 @@ initialize({
     Autodesk.Viewing.GEOMETRY_LOADED_EVENT,
     function () {
 
+      viewer.setProgressiveRendering(false)
+
       viewer.navigation.toPerspective()
 
       window.setState = function(state) {
