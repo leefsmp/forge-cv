@@ -242,7 +242,7 @@ export default class Worker {
       const p3 = await clientToWorld(this.page, obb.points[2])
       const p4 = await clientToWorld(this.page, obb.points[3])
 
-      fs.unlink(path, (error) => {}) 
+      //fs.unlink(path, (error) => {}) 
 
       this.sendMessage({
         data: [p1, p2, p3, p4],
