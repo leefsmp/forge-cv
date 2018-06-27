@@ -11,6 +11,18 @@ const config = {
   env: 'development',
 
   client: {
+    models:[
+      {
+        urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LWRldi8wNDg4LTMxMWEtMzAzMS5ydnQ',
+        thumbnail: '/resources/img/Office.png',
+        name: 'Office'
+      },
+      {
+        urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LWRldi9iNzk3LWUwMDItNDRiOC5kd2Y',
+        thumbnail: '/resources/img/Seat.png',
+        name: 'Seat'
+      }
+    ],
     host: `${HOST_URL}`,
     env: 'development',
     port: PORT

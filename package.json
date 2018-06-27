@@ -1,13 +1,13 @@
 {
-  "name": "forge-react-boiler",
-  "version": "2.0.0",
-  "description": "React+ Node.js Boilerplate project for Autodesk Forge Platform Web Services",
+  "name": "forge-cv",
+  "version": "1.0.0",
+  "description": "Autodesk Forge Viewer + Open CV via node.js binding",
   "scripts": {
     "build-worker": "babel --presets env,stage-0 ./src/worker -d ./bin/worker",
     "build-server": "babel --presets env,stage-0 ./src/server -d ./bin/server",
+    "postinstall": "npm run build-server && npm run build-worker",
     "build-prod": "cross-env NODE_ENV=production npm run build",
     "build": "npm run clean && node webpack",
-    "postinstall": "npm run build-server",
     "start": "node bin/start.js",
     "clean": "rimraf dist"
   },
@@ -15,17 +15,18 @@
   "license": "MIT",
   "keywords": [
     "autodesk",
-    "forge",
     "reactjs",
-    "node.js",
-    "express"
+    "express",
+    "opencv",
+    "nodejs",
+    "forge"
   ],
   "engines": {
     "node": "8.9.x"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Autodesk-Forge/forge-react-boiler.nodejs.git"
+    "url": "git+https://github.com/leefsmp/forge-cv.git"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",

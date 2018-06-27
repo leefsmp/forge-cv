@@ -11,6 +11,18 @@ const config = {
   env: 'production',
 
   client: {
+    models:[
+      {
+        urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LXRtcC1wcm9kLzFmNjAtNjhhMS00OTFlLnJ2dA',
+        thumbnail: '/resources/img/Office.png',
+        name: 'Office'
+      },
+      {
+        urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LXRtcC1wcm9kLzg3ZDctMTQ5Zi01MWVjLmR3Zg',
+        thumbnail: '/resources/img/Seat.png',
+        name: 'Seat'
+      }
+    ],
     // this the public host name of your server for the
     // client socket to connect.
     // eg. https://myforgeapp.mydomain.com
