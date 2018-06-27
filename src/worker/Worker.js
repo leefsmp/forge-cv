@@ -162,6 +162,7 @@ export default class Worker {
       args: [
         '--hide-scrollbars',
         '--mute-audio',
+        '--no-sandbox',
         '--headless'
       ]
     })
