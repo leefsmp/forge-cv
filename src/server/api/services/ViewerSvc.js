@@ -151,6 +151,7 @@ export default class ViewerSvc extends BaseSvc {
         args: [
           '--hide-scrollbars',
           '--mute-audio',
+          '--no-sandbox',
           '--headless'
         ]
       })
