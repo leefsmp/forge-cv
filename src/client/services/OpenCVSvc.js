@@ -30,7 +30,7 @@ export default class OpenCVSvc extends BaseSvc {
   /////////////////////////////////////////////////////////
   load ({urn, socketId}) {
 
-    const url = '/worker/load'
+    const url = '/load'
 
     return this.api.ajax({
       url: url,
