@@ -127,6 +127,10 @@ module.exports = () => {
   
     try {
 
+      const socketSvc = ServiceManager.getService('SocketSvc')
+
+      res.json('loading')
+
       const {urn, socketId} = req.body
 
       const workerPath = path.resolve(
@@ -142,15 +146,28 @@ module.exports = () => {
       const handler = (msg) => {
         switch (msg.id) {
             case 'load':
-              worker.removeListener('message', handler)
+              
+            worker.removeListener('message', handler)
+              
               if (msg.status === 200) {
+
                 workersMap.addWorker(
                   socketId, worker)
+
+                socketSvc.broadcast (
+                  'opencv.loaded', 
+                  msg.data, 
+                  socketId)
+
               } else {
+
                 worker.kill()
+                
+                socketSvc.broadcast (
+                  'opencv.error', 
+                  msg.data, 
+                  socketId)
               }
-              res.status(msg.status || 500)
-              return res.json(msg.data)
         }
       }
 

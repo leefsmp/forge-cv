@@ -13,6 +13,9 @@ export default class OpenCVExtension
 
     super(viewer, options)
 
+    this.onOpenCVLoaded = this.onOpenCVLoaded.bind(this)
+    this.onOpenCVError = this.onOpenCVError.bind(this)
+    
     this.openCVSvc = ServiceManager.getService('OpenCVSvc')
 
     this.socketSvc = ServiceManager.getService('SocketSvc')
@@ -26,7 +29,15 @@ export default class OpenCVExtension
   /////////////////////////////////////////////////////////
   load () {
 
-    const notification = this.notifySvc.add({
+    this.socketSvc.on (
+      'opencv.loaded',
+      this.onOpenCVLoaded)
+
+    this.socketSvc.on (
+      'opencv.error',
+      this.onOpenCVError)
+
+    this.notification = this.notifySvc.add({
       title: 'Initializing OpenCV',
       message: 'Please wait ...',
       dismissible: false,
@@ -36,30 +47,55 @@ export default class OpenCVExtension
       position: 'tl'
     })
 
-    this.notifySvc.update(notification)
+    this.notifySvc.update(this.notification)
 
     this.socketSvc.getSocketId().then (async(socketId) => {
 
-      const res = await this.openCVSvc.load({
+      this.openCVSvc.load({
         urn: this.options.urn,
         socketId
       })
-
-      this.OBBCommand = new OBBCommand (this.viewer, {
-        parentControl: this.options.parentControl,
-        openCVSvc: this.openCVSvc,
-        socketId
-      })
-
-      notification.title = 'OpenCV initialized !'
-      notification.dismissAfter = 2000
-      notification.status = 'success'
-      notification.message = ''
-
-      this.notifySvc.update(notification)
     })
     
     return true
+  }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  async onOpenCVLoaded () {
+
+    const socketId = await this.socketSvc.getSocketId()
+
+    this.OBBCommand = new OBBCommand (this.viewer, {
+      parentControl: this.options.parentControl,
+      openCVSvc: this.openCVSvc,
+      socketId
+    })
+
+    this.notification.title = 'OpenCV initialized :)'
+    this.notification.dismissAfter = 2000
+    this.notification.status = 'success'
+    this.notification.message = ''
+
+    this.notifySvc.update(this.notification)
+  }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  async onOpenCVError () {
+
+    const socketId = await this.socketSvc.getSocketId()
+
+    this.notification.title = 'OpenCV error :('
+    this.notification.dismissAfter = 2000
+    this.notification.status = 'error'
+    this.notification.message = ''
+
+    this.notifySvc.update(this.notification)
   }
 
   /////////////////////////////////////////////////////////
