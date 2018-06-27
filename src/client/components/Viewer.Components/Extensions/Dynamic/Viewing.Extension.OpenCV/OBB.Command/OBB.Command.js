@@ -14,6 +14,8 @@ export default class OBBCommand extends ViewerCommand {
       commandId: 'OBB'
     })
 
+    this.defaultCursor = this.viewer.impl.canvas.style.cursor
+
     this.onCameraChange = this.onCameraChange.bind(this)
     this.onResize = this.onResize.bind(this)
     this.onClick = this.onClick.bind(this)
@@ -137,6 +139,8 @@ export default class OBBCommand extends ViewerCommand {
   /////////////////////////////////////////////////////////
   onCameraChange () {
 
+    this.cameraChanged = true
+
     if (this.lines) {
     
       this.viewer.impl.removeOverlay(
@@ -153,9 +157,9 @@ export default class OBBCommand extends ViewerCommand {
   /////////////////////////////////////////////////////////
   async onClick (event) {
 
-    const defaultCursor = this.viewer.impl.canvas.style.cursor 
-
     try {
+
+      this.cameraChanged = false
 
       if (this.lines) {
 
@@ -188,6 +192,11 @@ export default class OBBCommand extends ViewerCommand {
           this.options.socketId, {
             state, size
           })
+
+        if (this.cameraChanged) {
+          this.viewer.impl.canvas.style.cursor = this.defaultCursor
+          return
+        }  
   
         const points2d = points3d.map((point3d) => {
           return this.viewer.worldToClient(point3d)
@@ -220,7 +229,7 @@ export default class OBBCommand extends ViewerCommand {
 
     } finally {
 
-      this.viewer.impl.canvas.style.cursor = defaultCursor
+      this.viewer.impl.canvas.style.cursor = this.defaultCursor
     }
   }
 }
