@@ -3,7 +3,7 @@
 // DEVELOPMENT configuration
 //
 /////////////////////////////////////////////////////////////////////
-const HOST_URL = process.env.HOST_URL || 'https://forge-react-boiler.autodesk.io'
+const HOST_URL = process.env.HOST_URL || 'https://forge-cv.autodesk.io'
 const PORT = process.env.PORT || 443
 
 const config = {
@@ -55,9 +55,9 @@ const config = {
     },
 
     viewer: {
-      viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.min.js?v=3.3',
-      threeJS:  'https://developer.api.autodesk.com/derivativeservice/v2/viewers/three.min.js?v=3.3',
-      style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=3.3'
+      viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.min.js?v=4.1.0',
+      threeJS:  'https://developer.api.autodesk.com/derivativeservice/v2/viewers/three.min.js?v=4.1.0',
+      style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=4.1.0'
     }
   }
 }
