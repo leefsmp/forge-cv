@@ -66,7 +66,7 @@ export default class OpenCVExtension
   //
   //
   /////////////////////////////////////////////////////////
-  onModelRootLoaded () {
+  onObjectTreeCreated () {
 
     const nav = this.viewer.navigation
     
