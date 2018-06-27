@@ -15,7 +15,7 @@ class WorkersMap {
   addWorker (id, worker) {
 
     if (this._workersMap[id]) {
-      this._workersMap.kill()
+      this._workersMap[id].kill()
       delete this._workersMap[id]
       this._workersMap[id] = null
     }
