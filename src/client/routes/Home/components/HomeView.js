@@ -1,5 +1,6 @@
 import { IndexLink, Link } from 'react-router'
 import {client as config} from 'c0nfig'
+import Background from 'Background'
 import React from 'react'
 import './HomeView.scss'
 
@@ -26,7 +27,7 @@ class HomeView extends React.Component {
 
     return (
       <div className="home">
-        <img className='logo-hero'/>
+        <Background/>
         <div className="models">
           <div className="title">
             Choose Model
