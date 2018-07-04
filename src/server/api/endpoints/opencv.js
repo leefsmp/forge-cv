@@ -5,6 +5,10 @@ import cp	from 'child_process'
 import express from 'express'
 import path from 'path'
 
+/////////////////////////////////////////////////////////
+// Tiny util class to manage workers
+//
+/////////////////////////////////////////////////////////
 class WorkersMap {
 
   constructor () {
@@ -38,6 +42,10 @@ class WorkersMap {
   }
 }
 
+/////////////////////////////////////////////////////////
+// API routes
+//
+/////////////////////////////////////////////////////////
 module.exports = () => {
 
   const socketSvc = ServiceManager.getService('SocketSvc')
@@ -67,60 +75,60 @@ module.exports = () => {
   // 
   //
   /////////////////////////////////////////////////////////
-  router.post('/load', async (req, res) => {
+  // router.post('/load', async (req, res) => {
 
-    try {
+  //   try {
 
-      const viewerSvc = ServiceManager.getService('ViewerSvc')
+  //     const viewerSvc = ServiceManager.getService('ViewerSvc')
 
-      const forgeSvc = ServiceManager.getService('ForgeSvc')
+  //     const forgeSvc = ServiceManager.getService('ForgeSvc')
 
-      const token = await forgeSvc.get2LeggedToken()
+  //     const token = await forgeSvc.get2LeggedToken()
 
-      const {urn, socketId} = req.body
+  //     const {urn, socketId} = req.body
 
-      await viewerSvc.load(socketId, 
-        token.access_token, 
-        urn)
+  //     await viewerSvc.load(socketId, 
+  //       token.access_token, 
+  //       urn)
 
-      res.json('loaded')
+  //     res.json('loaded')
 
-    } catch (ex) {
+  //   } catch (ex) {
 
-      res.status(ex.status || 500)
-      res.json(ex)
-    }
-  })
+  //     res.status(ex.status || 500)
+  //     res.json(ex)
+  //   }
+  // })
 
   /////////////////////////////////////////////////////////
   // 
   //
   /////////////////////////////////////////////////////////
-  router.post('/obb/:socketId', async (req, res) => {
+  // router.post('/obb/:socketId', async (req, res) => {
 
-    try {
+  //   try {
 
-      const viewerSvc = ServiceManager.getService('ViewerSvc')
+  //     const viewerSvc = ServiceManager.getService('ViewerSvc')
 
-      const {state, size} = req.body
+  //     const {state, size} = req.body
 
-      const obb = await viewerSvc.getOBB(
-        req.params.socketId, {
-          state, 
-          size
-        })
+  //     const obb = await viewerSvc.getOBB(
+  //       req.params.socketId, {
+  //         state, 
+  //         size
+  //       })
       
-      res.json(obb)
+  //     res.json(obb)
 
-    } catch (ex) {
+  //   } catch (ex) {
 
-      res.status(ex.status || 500)
-      res.json(ex)
-    }
-  })
+  //     res.status(ex.status || 500)
+  //     res.json(ex)
+  //   }
+  // })
 
   /////////////////////////////////////////////////////////
-  // 
+  // Instanciate worker and loads Forge model
   //
   /////////////////////////////////////////////////////////
   router.post('/worker/load', async (req, res) => {
@@ -196,7 +204,7 @@ module.exports = () => {
   })
 
   /////////////////////////////////////////////////////////
-  // 
+  // Request OBB from worker
   //
   /////////////////////////////////////////////////////////
   router.post('/worker/obb/:socketId', async (req, res) => {

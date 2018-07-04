@@ -52,9 +52,8 @@ const config = {
     },
 
     viewer: {
-      viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.js?v=4.1.0',
-      threeJS:  'https://developer.api.autodesk.com/derivativeservice/v2/viewers/three.js?v=4.1.0',
-      style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=4.1.0'
+      viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.js?v=5.0',
+      style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=5.0'
     }
   }
 }

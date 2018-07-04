@@ -131,10 +131,18 @@ class ViewerView extends React.Component {
 
           this.props.setViewerEnv('AutodeskProduction')
 
-          Autodesk.Viewing.endpoint.setEndpointAndApi(
-            window.location.origin + '/lmv-proxy-2legged',
-            'modelDerivativeV2')
+          const endpoint = window.location.origin + '/lmv-proxy-2legged'
 
+          if (Autodesk.Viewing.endpoint) {
+
+            Autodesk.Viewing.endpoint.setEndpointAndApi(
+              endpoint, 'derivativeV2')
+
+          } else if (Autodesk.Viewing.setApiEndpoint) {
+
+            Autodesk.Viewing.setApiEndpoint(endpoint) 
+          }
+          
           Autodesk.Viewing.Private.memoryOptimizedSvfLoading = true
 
           //Autodesk.Viewing.Private.logger.setLevel(0)
@@ -164,8 +172,11 @@ class ViewerView extends React.Component {
 
         viewer.start()
 
-        viewer.setTheme('light-theme')
+        if (viewer.setTheme) {
 
+          viewer.setTheme('light-theme')
+        }
+        
         const ctrlGroup = this.createToolbar (viewer)
 
         viewer.loadDynamicExtension(
@@ -174,6 +185,11 @@ class ViewerView extends React.Component {
             urn
           })
 
+        viewer.addEventListener(
+          Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => { 
+            viewer.loadDynamicExtension('Dotty.Viewing.Extension.SectionBox')
+          })
+        
         viewer.loadModel(path)
 
       } catch (ex) {
