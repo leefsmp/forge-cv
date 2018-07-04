@@ -4,7 +4,7 @@ Autodesk Forge Viewer integration with OpenCV via [Node.js bindings](https://git
 
   * Oriented Bounding Box:
 
-![thumbnail](resources/img/demo.gif=800x400)
+![thumbnail](resources/img/demo.gif =800x400)
 
 ## Live Demo
 
