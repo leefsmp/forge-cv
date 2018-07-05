@@ -185,11 +185,6 @@ class ViewerView extends React.Component {
             urn
           })
 
-        viewer.addEventListener(
-          Autodesk.Viewing.GEOMETRY_LOADED_EVENT, () => { 
-            viewer.loadDynamicExtension('Dotty.Viewing.Extension.SectionBox')
-          })
-        
         viewer.loadModel(path)
 
       } catch (ex) {

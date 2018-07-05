@@ -152,7 +152,8 @@ initialize({
         return JSON.stringify(res)
       }
 
-      viewerDiv.classList.add("geometry-loaded")
+      viewerDiv.classList.add(
+        "geometry-loaded")
     })
 
   var path = getQueryParam("path")
@@ -163,11 +164,13 @@ initialize({
 
   } else {
 
-    loadDocument ("urn:" + getQueryParam("urn")).then(function(doc) {
+    loadDocument ("urn:" + getQueryParam("urn")).then(
+      function(doc) {
 
-      var items = getViewableItems (doc, ["3d", "2d"])
-  
-      viewer.start(doc.getViewablePath(items[0]))
-    })
+        var items = getViewableItems (
+          doc, ["3d", "2d"])
+    
+        viewer.start(doc.getViewablePath(items[0]))
+      })
   }
 })
