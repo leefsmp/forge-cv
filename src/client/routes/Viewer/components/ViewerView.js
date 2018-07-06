@@ -98,7 +98,7 @@ class ViewerView extends React.Component {
 
     const ctrlGroup =
       new Autodesk.Viewing.UI.ControlGroup(
-        'configurator')
+        'opencv')
 
     toolbar.addControl(ctrlGroup)
 
@@ -181,6 +181,7 @@ class ViewerView extends React.Component {
 
         viewer.loadDynamicExtension(
           'Viewing.Extension.OpenCV', {
+            path: path.replace('resources/', '../'),
             parentControl: ctrlGroup,
             urn
           })

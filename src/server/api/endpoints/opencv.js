@@ -3,7 +3,8 @@ import ServiceManager from '../services/SvcManager'
 import compression from 'compression'
 import cp	from 'child_process'
 import express from 'express'
-import path from 'path'
+import pathUtils from 'path'
+import cv from 'opencv'
 
 /////////////////////////////////////////////////////////
 // Tiny util class to manage workers
@@ -75,6 +76,52 @@ module.exports = () => {
   // 
   //
   /////////////////////////////////////////////////////////
+  router.get('/test', async (req, res) => {
+
+    try {
+
+      res.json('done')
+
+      const data = pathUtils.resolve(
+        __dirname, "./detect/hogcascade_cars_sideview.xml")
+
+      const img = pathUtils.resolve(
+        __dirname, "./detect/car1.jpg")
+
+      cv.readImage(img, (err, im) => {
+
+        if (err) throw err;
+        if (im.width() < 1 || im.height() < 1) throw new Error('Image has no size');
+      
+        im.detectObject(data, {}, (err, cars) => {
+
+          if (err) throw err;
+      
+          for (var i=0; i < cars.length; i++){
+            var x = cars[i];
+            im.rectangle([x.x, x.y], [x.width, x.height]);
+          }
+      
+          im.save('./tmp/car-detection.jpg');
+
+          console.log('Image saved to ./tmp/car-detection.jpg');
+        })
+      })
+
+    } catch (ex) {
+
+      console.log(ex)
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+  
+
+  /////////////////////////////////////////////////////////
+  // 
+  //
+  /////////////////////////////////////////////////////////
   // router.post('/load', async (req, res) => {
 
   //   try {
@@ -135,13 +182,11 @@ module.exports = () => {
   
     try {
 
-      const socketSvc = ServiceManager.getService('SocketSvc')
-
       res.json('loading')
 
-      const {urn, socketId} = req.body
+      const {path, urn, socketId} = req.body
 
-      const workerPath = path.resolve(
+      const workerPath = pathUtils.resolve(
         __dirname, '../../../../bin/worker')
 
       const worker = cp.fork(workerPath, {
@@ -193,6 +238,7 @@ module.exports = () => {
       worker.send({
         access_token,
         id: 'load',
+        path,
         urn
       })
 

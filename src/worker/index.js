@@ -1,8 +1,7 @@
 // async support
 import 'babel-polyfill'
-
+import {worker as config} from 'c0nfig'
 import Worker from './Worker'
-import config from 'c0nfig'
 
 ///////////////////////////////////////////////////////////
 //
@@ -28,7 +27,7 @@ process.on('message', (msg) => {
   switch (msg.id) {
 
     case 'load':
-      worker.load(msg.access_token, msg.urn)
+      worker.load(msg.access_token, msg.urn, msg.path)
       break
 
     case 'obb':

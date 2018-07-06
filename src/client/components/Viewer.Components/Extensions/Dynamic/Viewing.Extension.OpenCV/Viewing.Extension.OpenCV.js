@@ -1,4 +1,5 @@
 import MultiModelExtensionBase from 'Viewer.MultiModelExtensionBase'
+import DetectCommand from './Detect.Command'
 import ServiceManager from 'SvcManager'
 import OBBCommand from './OBB.Command'
 
@@ -52,6 +53,7 @@ export default class OpenCVExtension
     this.socketSvc.getSocketId().then (async(socketId) => {
 
       this.openCVSvc.load({
+        path: this.options.path,
         urn: this.options.urn,
         socketId
       })
@@ -67,6 +69,12 @@ export default class OpenCVExtension
   async onOpenCVLoaded () {
 
     const socketId = await this.socketSvc.getSocketId()
+
+    this.DetectCommand = new DetectCommand (this.viewer, {
+      parentControl: this.options.parentControl,
+      openCVSvc: this.openCVSvc,
+      socketId
+    })
 
     this.OBBCommand = new OBBCommand (this.viewer, {
       parentControl: this.options.parentControl,

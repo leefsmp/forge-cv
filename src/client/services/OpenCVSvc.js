@@ -28,7 +28,7 @@ export default class OpenCVSvc extends BaseSvc {
   //
   //
   /////////////////////////////////////////////////////////
-  load ({urn, socketId}) {
+  load ({path, socketId, urn}) {
 
     const url = '/worker/load'
 
@@ -41,6 +41,7 @@ export default class OpenCVSvc extends BaseSvc {
       },
       data: JSON.stringify({
         socketId,
+        path,
         urn
       })
     })

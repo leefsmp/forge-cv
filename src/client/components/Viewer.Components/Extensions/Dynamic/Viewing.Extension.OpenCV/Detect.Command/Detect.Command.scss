@@ -1,0 +1,29 @@
+
+.toolbar-detect {
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 24px;
+  width: 24px;
+}
+
+.detect-tooltip {
+  transition-timing-function: ease;
+  transition-property: opacity;
+  transition-duration: 1.0s;
+  transition-delay: 0.0s;
+
+  position: absolute;
+  font-weight: bold;
+  overflow: hidden;
+  color: blue;
+  display: none;
+  height: 20px;
+  opacity: 0;
+}
+
+.tooltip-text {
+  background-color: #ededed !important;
+  border: 1px solid grey;
+  color: grey !important;
+  padding: 4px;
+}

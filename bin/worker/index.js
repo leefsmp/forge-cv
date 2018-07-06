@@ -2,13 +2,11 @@
 
 require('babel-polyfill');
 
+var _c0nfig = require('c0nfig');
+
 var _Worker = require('./Worker');
 
 var _Worker2 = _interopRequireDefault(_Worker);
-
-var _c0nfig = require('c0nfig');
-
-var _c0nfig2 = _interopRequireDefault(_c0nfig);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -16,8 +14,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 ///////////////////////////////////////////////////////////
-process.on('disconnect', function () {
+var worker = new _Worker2.default(_c0nfig.worker);
 
+///////////////////////////////////////////////////////////
+//
+//
+///////////////////////////////////////////////////////////
+// async support
+process.on('disconnect', function () {
+  worker.terminate();
   process.kill();
 });
 
@@ -25,15 +30,12 @@ process.on('disconnect', function () {
 //
 //
 ///////////////////////////////////////////////////////////
-// async support
-var worker = new _Worker2.default(_c0nfig2.default);
-
 process.on('message', function (msg) {
 
   switch (msg.id) {
 
     case 'load':
-      worker.load(msg.access_token, msg.urn);
+      worker.load(msg.access_token, msg.urn, msg.path);
       break;
 
     case 'obb':

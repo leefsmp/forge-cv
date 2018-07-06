@@ -19,6 +19,7 @@ const config = {
       },
       {
         urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LWRldi9iNzk3LWUwMDItNDRiOC5kd2Y',
+        path: 'resources/models/seat/seat.svf',
         thumbnail: '/resources/img/Seat.png',
         name: 'Seat'
       }
@@ -55,6 +56,10 @@ const config = {
       viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.js?v=5.0',
       style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.css?v=5.0'
     }
+  },
+
+  worker: {
+    viewerUrl: `http://localhost:${PORT}/resources/viewer/viewer.html`
   }
 }
 

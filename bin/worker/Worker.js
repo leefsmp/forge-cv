@@ -29,14 +29,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 /////////////////////////////////////////////////////////////////
-//
+// Loads an image with node OpenCV SDK
 //
 /////////////////////////////////////////////////////////////////
-var loadImage = function loadImage(filename) {
+var loadImage = function loadImage(source) {
 
   return new Promise(function (resolve, reject) {
 
-    _opencv2.default.readImage(filename, function (err, img) {
+    _opencv2.default.readImage(source, function (err, img) {
 
       try {
 
@@ -58,7 +58,7 @@ var loadImage = function loadImage(filename) {
 };
 
 /////////////////////////////////////////////////////////////////
-//
+// Gets Oriented Bounding Box with node OpenCV SDK
 //
 /////////////////////////////////////////////////////////////////
 var _getOBB = function _getOBB(img) {
@@ -90,7 +90,7 @@ var _getOBB = function _getOBB(img) {
 };
 
 /////////////////////////////////////////////////////////////////
-//
+// Helper method for puppeteer
 //
 /////////////////////////////////////////////////////////////////
 var setState = function setState(page, state) {
@@ -100,7 +100,7 @@ var setState = function setState(page, state) {
 };
 
 /////////////////////////////////////////////////////////////////
-//
+// Helper method for puppeteer
 //
 /////////////////////////////////////////////////////////////////
 var clientToWorld = function clientToWorld(page, _ref) {
@@ -141,7 +141,7 @@ var clientToWorld = function clientToWorld(page, _ref) {
 };
 
 /////////////////////////////////////////////////////////////////
-//
+// Generates random GUID
 //
 /////////////////////////////////////////////////////////////////
 var guid = function guid() {
@@ -159,6 +159,11 @@ var guid = function guid() {
   return guid;
 };
 
+/////////////////////////////////////////////////////////
+// Worker implementation
+//
+/////////////////////////////////////////////////////////
+
 var Worker = function () {
 
   /////////////////////////////////////////////////////////
@@ -171,10 +176,12 @@ var Worker = function () {
     this.sendMessage = this.sendMessage.bind(this);
 
     this.pid = process.pid;
+
+    this.config = config;
   }
 
   /////////////////////////////////////////////////////////
-  //
+  // Sends message to master process
   //
   /////////////////////////////////////////////////////////
 
@@ -187,14 +194,30 @@ var Worker = function () {
     }
 
     /////////////////////////////////////////////////////////
+    // Terminates worker
     //
-    //
+    /////////////////////////////////////////////////////////
+
+  }, {
+    key: 'terminate',
+    value: function terminate() {
+
+      if (this.browser) {
+
+        this.browser.close();
+      }
+    }
+
+    /////////////////////////////////////////////////////////
+    // Fires an instance of puppeteer
+    // and loads Forge model from URN
+    // 
     /////////////////////////////////////////////////////////
 
   }, {
     key: 'load',
     value: function () {
-      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(accessToken, urn) {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(accessToken, urn, path) {
         var browser, filename, url, page;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -203,29 +226,38 @@ var Worker = function () {
                 _context2.next = 2;
                 return _puppeteer2.default.launch({
                   headless: false,
-                  args: ['--hide-scrollbars', '--mute-audio', '--headless']
+                  args: ['--hide-scrollbars', '--mute-audio', '--no-sandbox', '--headless']
                 });
 
               case 2:
                 browser = _context2.sent;
                 _context2.prev = 3;
-                filename = _path2.default.resolve(__dirname, '../..', './resources/viewer/viewer.html');
-                url = 'file://' + filename + '?accessToken=' + accessToken + '&urn=' + urn;
-                _context2.next = 8;
+                filename = _path2.default.resolve(__dirname, '../..', 'resources/viewer/viewer.html');
+                url = this.config.viewerUrl || 'file://' + filename;
+
+
+                if (urn) {
+
+                  url += '?accessToken=' + accessToken + '&urn=' + urn;
+                }
+
+                if (path) url += '?path=' + path;
+
+                _context2.next = 10;
                 return browser.newPage();
 
-              case 8:
+              case 10:
                 page = _context2.sent;
-                _context2.next = 11;
+                _context2.next = 13;
                 return page.goto(url);
 
-              case 11:
-                _context2.next = 13;
+              case 13:
+                _context2.next = 15;
                 return page.mainFrame().waitForSelector('.geometry-loaded', {
                   timeout: 300000
                 });
 
-              case 13:
+              case 15:
 
                 this.browser = browser;
                 this.page = page;
@@ -236,11 +268,11 @@ var Worker = function () {
                   id: 'load'
                 });
 
-                _context2.next = 22;
+                _context2.next = 24;
                 break;
 
-              case 18:
-                _context2.prev = 18;
+              case 20:
+                _context2.prev = 20;
                 _context2.t0 = _context2['catch'](3);
 
 
@@ -252,15 +284,15 @@ var Worker = function () {
                   data: _context2.t0
                 });
 
-              case 22:
+              case 24:
               case 'end':
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[3, 18]]);
+        }, _callee2, this, [[3, 20]]);
       }));
 
-      function load(_x4, _x5) {
+      function load(_x4, _x5, _x6) {
         return _ref3.apply(this, arguments);
       }
 
@@ -268,7 +300,7 @@ var Worker = function () {
     }()
 
     /////////////////////////////////////////////////////////
-    //
+    // Gets Oriented Bounding Box
     //
     /////////////////////////////////////////////////////////
 
@@ -276,7 +308,7 @@ var Worker = function () {
     key: 'getOBB',
     value: function () {
       var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(state, size) {
-        var path, clip, img, obb, p1, p2, p3, p4;
+        var path, clip, buffer, img, obb, p1, p2, p3, p4;
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -304,31 +336,32 @@ var Worker = function () {
                 });
 
               case 9:
-                _context3.next = 11;
+                buffer = _context3.sent;
+                _context3.next = 12;
                 return loadImage(path);
 
-              case 11:
+              case 12:
                 img = _context3.sent;
                 obb = _getOBB(img);
-                _context3.next = 15;
+                _context3.next = 16;
                 return clientToWorld(this.page, obb.points[0]);
 
-              case 15:
+              case 16:
                 p1 = _context3.sent;
-                _context3.next = 18;
+                _context3.next = 19;
                 return clientToWorld(this.page, obb.points[1]);
 
-              case 18:
+              case 19:
                 p2 = _context3.sent;
-                _context3.next = 21;
+                _context3.next = 22;
                 return clientToWorld(this.page, obb.points[2]);
 
-              case 21:
+              case 22:
                 p3 = _context3.sent;
-                _context3.next = 24;
+                _context3.next = 25;
                 return clientToWorld(this.page, obb.points[3]);
 
-              case 24:
+              case 25:
                 p4 = _context3.sent;
 
 
@@ -340,11 +373,11 @@ var Worker = function () {
                   id: 'obb'
                 });
 
-                _context3.next = 33;
+                _context3.next = 34;
                 break;
 
-              case 29:
-                _context3.prev = 29;
+              case 30:
+                _context3.prev = 30;
                 _context3.t0 = _context3['catch'](0);
 
 
@@ -355,15 +388,15 @@ var Worker = function () {
                   data: _context3.t0
                 });
 
-              case 33:
+              case 34:
               case 'end':
                 return _context3.stop();
             }
           }
-        }, _callee3, this, [[0, 29]]);
+        }, _callee3, this, [[0, 30]]);
       }));
 
-      function getOBB(_x6, _x7) {
+      function getOBB(_x7, _x8) {
         return _ref4.apply(this, arguments);
       }
 

@@ -7,11 +7,11 @@ import fs from 'fs'
 // Loads an image with node OpenCV SDK
 //
 /////////////////////////////////////////////////////////////////
-const loadImage = (filename) => {
+const loadImage = (source) => {
 
   return new Promise((resolve, reject) => {
 
-    cv.readImage(filename, (err, img) => {
+    cv.readImage(source, (err, img) => {
 
       try {
 
@@ -116,7 +116,10 @@ const guid = (format='xxxxxxxxxxxx') => {
 }
 
 
-
+/////////////////////////////////////////////////////////
+// Worker implementation
+//
+/////////////////////////////////////////////////////////
 export default class Worker {
 
   /////////////////////////////////////////////////////////
@@ -128,10 +131,12 @@ export default class Worker {
     this.sendMessage = this.sendMessage.bind(this)
 
     this.pid = process.pid
+
+    this.config = config
   }
 
   /////////////////////////////////////////////////////////
-  //
+  // Sends message to master process
   //
   /////////////////////////////////////////////////////////
   sendMessage (msg) {
@@ -140,7 +145,7 @@ export default class Worker {
   }
 
   /////////////////////////////////////////////////////////
-  //
+  // Terminates worker
   //
   /////////////////////////////////////////////////////////
   terminate () {
@@ -156,7 +161,7 @@ export default class Worker {
   // and loads Forge model from URN
   // 
   /////////////////////////////////////////////////////////
-  async load (accessToken, urn) {
+  async load (accessToken, urn, path) {
 
     const browser = await puppeteer.launch({
       headless: false,
@@ -172,10 +177,17 @@ export default class Worker {
   
       const filename = pathUtils.resolve(
         __dirname, '../..',
-        './resources/viewer/viewer.html')
+        'resources/viewer/viewer.html')
   
-      const url = `file://${filename}?accessToken=${accessToken}&urn=${urn}`
+      let url = this.config.viewerUrl || `file://${filename}`
       
+      if (urn) {
+
+        url += `?accessToken=${accessToken}&urn=${urn}`
+      }
+
+      if (path) url += `?path=${path}`
+       
       const page = await browser.newPage()
 
       await page.goto(url)
@@ -229,10 +241,11 @@ export default class Worker {
 
       await this.page.setViewport(size)
 
-      await this.page.screenshot({
-        path,
-        clip
-      })
+      const buffer = 
+        await this.page.screenshot({
+          path,
+          clip
+        })
 
       const img = await loadImage(path)
 
@@ -253,6 +266,7 @@ export default class Worker {
 
     } catch (ex) {
 
+      console.log(ex)
       this.sendMessage({
         status: 500,
         id: 'obb',
