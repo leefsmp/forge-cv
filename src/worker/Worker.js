@@ -208,6 +208,8 @@ export default class Worker {
        
       const page = await browser.newPage()
 
+      console.log(url)
+
       await page.goto(url)
 
       await page.mainFrame().waitForSelector(
