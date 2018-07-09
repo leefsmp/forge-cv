@@ -181,6 +181,9 @@ export default class Worker {
   /////////////////////////////////////////////////////////
   async load (accessToken, urn, path) {
 
+    console.log('URN: ' + urn)
+    console.log('PATH: ' + path)
+
     const browser = await puppeteer.launch({
       headless: false,
       args: [
@@ -202,9 +205,11 @@ export default class Worker {
       if (urn) {
 
         url += `?accessToken=${accessToken}&urn=${urn}`
-      }
 
-      if (path) url += `?path=${path}`
+      } else if (path) {
+
+        url += `?path=${path}`
+      }
        
       const page = await browser.newPage()
 
