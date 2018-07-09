@@ -1,3 +1,4 @@
+resources/models
 node_modules
 bin/server
 .DS_STORE
