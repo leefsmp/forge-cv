@@ -36,7 +36,17 @@ class HomeView extends React.Component {
             {
               this.state.models.map((model, idx) => {
 
-                let query = `urn=${model.urn}`
+                let query = ''
+
+                if (model.urn) {
+
+                  query = `urn=${model.urn}`
+                }
+                 
+                if (model.path) {
+
+                  query = `path=${model.path}`
+                }
 
                 if (model.extensions) {
 

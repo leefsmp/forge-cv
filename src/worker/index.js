@@ -30,6 +30,10 @@ process.on('message', (msg) => {
       worker.load(msg.access_token, msg.urn, msg.path)
       break
 
+    case 'detect':
+      worker.detectObjects(msg.state, msg.size, msg.guid)
+      break
+
     case 'obb':
       worker.getOBB(msg.state, msg.size)
       break

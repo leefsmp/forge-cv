@@ -137,13 +137,16 @@ initialize({
 
       viewer.setProgressiveRendering(false)
 
+      viewer.setGhosting(false)
+
       viewer.navigation.toPerspective()
 
       window.setState = function(state) {
 
-        viewer.restoreState(state, 
-          {viewport: true}, 
-          true)
+        viewer.restoreState(state, {
+          objectSet: true,
+          viewport: true
+        }, true)
       }
 
       window.clientToWorld = function(x, y) {

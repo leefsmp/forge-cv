@@ -94,7 +94,7 @@ export default class OpenCVExtension
   //
   //
   /////////////////////////////////////////////////////////
-  async onOpenCVError () {
+  async onOpenCVError (error) {
 
     const socketId = await this.socketSvc.getSocketId()
 
@@ -104,6 +104,8 @@ export default class OpenCVExtension
     this.notification.message = ''
 
     this.notifySvc.update(this.notification)
+
+    console.log(error)
   }
 
   /////////////////////////////////////////////////////////

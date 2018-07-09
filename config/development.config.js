@@ -18,10 +18,21 @@ const config = {
         name: 'Office'
       },
       {
-        urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LWRldi9iNzk3LWUwMDItNDRiOC5kd2Y',
+        //urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LWRldi9iNzk3LWUwMDItNDRiOC5kd2Y',
         path: 'resources/models/seat/seat.svf',
         thumbnail: '/resources/img/Seat.png',
         name: 'Seat'
+      },
+      {
+        path: 'resources/models/sportscar/0.svf',
+        thumbnail: '/resources/img/Seat.png',
+        name: 'Sports Car'
+      },
+      {
+        //urn: 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6Zm9yZ2UtcmNkYi1nYWxsZXJ5LWRldi9iNzk3LWUwMDItNDRiOC5kd2Y',
+        path: 'resources/models/car/Resource/3D_View/3D/3D.svf',
+        thumbnail: '/resources/img/Seat.png',
+        name: 'Car'
       }
     ],
     host: `${HOST_URL}`,

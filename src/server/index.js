@@ -91,7 +91,7 @@ ServiceManager.registerService(fileSvc)
 ///////////////////////////////////////////////////////////
 app.use('/api/socket', SocketAPI())
 app.use('/api/forge', ForgeAPI())
-
+//app.use('/api/opencv', OpenCVAPI())
 ///////////////////////////////////////////////////////////
 // Viewer GET Proxy
 //

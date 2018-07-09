@@ -66,6 +66,24 @@ const getOBB = (img) => {
 }
 
 /////////////////////////////////////////////////////////////////
+// Objects detection
+//
+/////////////////////////////////////////////////////////////////
+const detectObjects = (data, img) => {
+
+  return new Promise((resolve, reject) => {
+
+    img.detectObject(data, {}, (err, objects) => {
+
+      return err 
+        ? reject(err)
+        : resolve(objects)
+    
+    })
+  })
+}
+
+/////////////////////////////////////////////////////////////////
 // Helper method for puppeteer
 //
 /////////////////////////////////////////////////////////////////
@@ -266,10 +284,102 @@ export default class Worker {
 
     } catch (ex) {
 
-      console.log(ex)
       this.sendMessage({
         status: 500,
         id: 'obb',
+        data: ex
+      })
+    } 
+  }
+
+  /////////////////////////////////////////////////////////
+  // 
+  //
+  /////////////////////////////////////////////////////////
+  async detectObjects (state, size) {
+
+    try {
+  
+      await setState(this.page, state)
+
+      const path = pathUtils.resolve(
+        __dirname, '../..',
+        `./TMP/${guid()}.jpg`)  
+
+      const clip  = {
+        height: size.height,  
+        width: size.width,  
+        x: 0,
+        y: 0,
+      }  
+
+      await this.page.setViewport(size)
+
+      const buffer = 
+        await this.page.screenshot({
+          path,
+          clip
+        })
+
+      const img = await loadImage(path)
+
+      const sideview = pathUtils.resolve(
+        __dirname, '../..',
+        `./data/car/sideview.xml`)
+
+      const cars = pathUtils.resolve(
+        __dirname, '../..',
+        `./data/car/cars.xml`)
+
+      const views = [cars]
+      
+      const res = []
+
+      for (let i=0; i<views.length; ++i) {
+      
+        const objects = await detectObjects (views[i], img)
+
+        for (let j=0; j<objects.length; ++j) {
+
+          const obj = objects[j]
+
+          const p1 = await clientToWorld(this.page, {
+            x: obj.x,
+            y: obj.y,
+          })
+
+          const p2 = await clientToWorld(this.page, {
+            x: obj.x + obj.width,
+            y: obj.y,
+          })
+
+          const p3 = await clientToWorld(this.page, {
+            x: obj.x + obj.width,
+            y: obj.y + obj.height,
+          })
+
+          const p4 = await clientToWorld(this.page, {
+            x: obj.x,
+            y: obj.y + obj.height,
+          })
+
+          res.push([p1, p2, p3, p4])
+        }
+      }
+
+      fs.unlink(path, (error) => {}) 
+
+      this.sendMessage({
+        status: 200,
+        id: 'detect',
+        data: res
+      })
+
+    } catch (ex) {
+      
+      this.sendMessage({
+        status: 500,
+        id: 'detect',
         data: ex
       })
     } 

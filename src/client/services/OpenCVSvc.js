@@ -65,4 +65,23 @@ export default class OpenCVSvc extends BaseSvc {
       data: JSON.stringify(params)
     })
   }
+
+  /////////////////////////////////////////////////////////
+  //
+  //
+  /////////////////////////////////////////////////////////
+  detectObjects (socketId, params) {
+
+    const url = `/worker/detect/${socketId}`
+
+    return this.api.ajax({
+      url: url,
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(params)
+    })
+  }
 }

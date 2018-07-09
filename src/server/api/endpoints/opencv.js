@@ -67,11 +67,14 @@ module.exports = () => {
     filter: shouldCompress
   }))
 
-  socketSvc.on('disconnect', (id) => {
+  if (socketSvc) {
 
-    workersMap.removeWorker(id)
-  })
+    socketSvc.on('disconnect', (id) => {
 
+      workersMap.removeWorker(id)
+    })
+  }
+  
   /////////////////////////////////////////////////////////
   // 
   //
@@ -86,7 +89,7 @@ module.exports = () => {
         __dirname, "./detect/hogcascade_cars_sideview.xml")
 
       const img = pathUtils.resolve(
-        __dirname, "./detect/car1.jpg")
+        __dirname, "./detect/car3.png")
 
       cv.readImage(img, (err, im) => {
 
@@ -99,6 +102,7 @@ module.exports = () => {
       
           for (var i=0; i < cars.length; i++){
             var x = cars[i];
+            console.log(x)
             im.rectangle([x.x, x.y], [x.width, x.height]);
           }
       
@@ -282,6 +286,49 @@ module.exports = () => {
         id: 'obb',
         state, 
         size
+      })
+
+    } catch (ex) {
+
+      res.status(ex.status || 500)
+      res.json(ex)
+    }
+  })
+
+  /////////////////////////////////////////////////////////
+  // Object detection
+  //
+  /////////////////////////////////////////////////////////
+  router.post('/worker/detect/:socketId', async (req, res) => {
+
+    try {
+
+      const worker = workersMap.getWorker(
+        req.params.socketId)
+      
+      if (!worker) {
+        res.status(404)
+        return res.json('Invalid socketId')
+      }
+      
+      const {state, size, guid} = req.body
+
+      const handler = (msg) => {
+        switch (msg.id) {
+            case 'detect':
+              worker.removeListener('message', handler)
+              res.status(msg.status || 500)
+              return res.json(msg.data)
+        }
+      }
+
+      worker.on('message', handler)
+
+      worker.send({
+        id: 'detect',
+        state, 
+        size,
+        guid
       })
 
     } catch (ex) {

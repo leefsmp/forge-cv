@@ -67,11 +67,13 @@ export default class DetectCommand extends ViewerCommand {
         
       if (this.lines) {
 
-        this.viewer.impl.removeOverlay(
-          'detect-overlay',
-          this.lines)
+        this.lines.forEach((line) => {
+          this.viewer.impl.removeOverlay(
+            'detect-overlay',
+            line)
+        })
         
-          this.lines = null
+        this.lines = null
       }    
 
       this.tooltip.deactivate()
@@ -145,11 +147,13 @@ export default class DetectCommand extends ViewerCommand {
 
     if (this.lines) {
     
-      this.viewer.impl.removeOverlay(
-        'detect-overlay',
-        this.lines)
+      this.lines.forEach((line) => {
+        this.viewer.impl.removeOverlay(
+          'detect-overlay',
+          line)
+      })
     
-        this.lines = null
+      this.lines = null
     }  
 
     clearTimeout(this.timerId)
@@ -170,9 +174,11 @@ export default class DetectCommand extends ViewerCommand {
 
       if (this.lines) {
 
-        this.viewer.impl.removeOverlay(
-          'detect-overlay',
-          this.lines)
+        this.lines.forEach((line) => {
+          this.viewer.impl.removeOverlay(
+            'detect-overlay',
+            line)
+        })
         
         this.lines = null
       }  
@@ -182,6 +188,7 @@ export default class DetectCommand extends ViewerCommand {
       const rect = this.viewer.impl.canvas.getBoundingClientRect()
 
       const state = this.viewer.getState({
+        objectSet: true,
         viewport: true
       })
 
@@ -190,39 +197,46 @@ export default class DetectCommand extends ViewerCommand {
         width: rect.width
       }
 
-      const points3d = await this.openCVSvc.getOBB(
+      const objects = await this.openCVSvc.detectObjects(
         this.options.socketId, {
           guid: this.stateGuid,
           state, 
           size
         })
 
-      const points2d = points3d.map((point3d) => {
-        return this.viewer.worldToClient(point3d)
+      this.lines = []
+
+      objects.forEach((obj) => {
+
+        const points2d = obj.map((point3d) => {
+          return this.viewer.worldToClient(point3d)
+        })
+
+        const lineGeometry = new THREE.Geometry()
+
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[1].x, points2d[1].y, -10))
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[2].x, points2d[2].y, -10))    
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[3].x, points2d[3].y, -10))    
+        lineGeometry.vertices.push(
+          new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
+
+        const line = new THREE.Line(
+          lineGeometry,
+          this.materialLine,
+          THREE.LineStrip)
+
+        this.viewer.impl.addOverlay(
+          'detect-overlay',
+          line)
+        
+        this.lines.push(line)
       })
 
-      const lineGeometry = new THREE.Geometry()
-
-      lineGeometry.vertices.push(
-        new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
-      lineGeometry.vertices.push(
-        new THREE.Vector3(points2d[1].x, points2d[1].y, -10))
-      lineGeometry.vertices.push(
-        new THREE.Vector3(points2d[2].x, points2d[2].y, -10))    
-      lineGeometry.vertices.push(
-        new THREE.Vector3(points2d[3].x, points2d[3].y, -10))    
-      lineGeometry.vertices.push(
-        new THREE.Vector3(points2d[0].x, points2d[0].y, -10))
-
-      this.lines = new THREE.Line(
-        lineGeometry,
-        this.materialLine,
-        THREE.LineStrip)
-
-      this.viewer.impl.addOverlay(
-        'detect-overlay',
-        this.lines)
-  
       this.viewer.impl.invalidate(false, false, true)
 
     } finally {

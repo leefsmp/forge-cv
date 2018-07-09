@@ -90,6 +90,21 @@ var _getOBB = function _getOBB(img) {
 };
 
 /////////////////////////////////////////////////////////////////
+// Objects detection
+//
+/////////////////////////////////////////////////////////////////
+var _detectObjects = function _detectObjects(data, img) {
+
+  return new Promise(function (resolve, reject) {
+
+    img.detectObject(data, {}, function (err, objects) {
+
+      return err ? reject(err) : resolve(objects);
+    });
+  });
+};
+
+/////////////////////////////////////////////////////////////////
 // Helper method for puppeteer
 //
 /////////////////////////////////////////////////////////////////
@@ -401,6 +416,160 @@ var Worker = function () {
       }
 
       return getOBB;
+    }()
+
+    /////////////////////////////////////////////////////////
+    // 
+    //
+    /////////////////////////////////////////////////////////
+
+  }, {
+    key: 'detectObjects',
+    value: function () {
+      var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(state, size) {
+        var path, clip, buffer, img, sideview, cars, views, res, i, objects, j, obj, p1, p2, p3, p4;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _context4.prev = 0;
+                _context4.next = 3;
+                return setState(this.page, state);
+
+              case 3:
+                path = _path2.default.resolve(__dirname, '../..', './TMP/' + guid() + '.jpg');
+                clip = {
+                  height: size.height,
+                  width: size.width,
+                  x: 0,
+                  y: 0
+                };
+                _context4.next = 7;
+                return this.page.setViewport(size);
+
+              case 7:
+                _context4.next = 9;
+                return this.page.screenshot({
+                  path: path,
+                  clip: clip
+                });
+
+              case 9:
+                buffer = _context4.sent;
+                _context4.next = 12;
+                return loadImage(path);
+
+              case 12:
+                img = _context4.sent;
+                sideview = _path2.default.resolve(__dirname, '../..', './data/car/sideview.xml');
+                cars = _path2.default.resolve(__dirname, '../..', './data/car/cars.xml');
+                views = [cars];
+                res = [];
+                i = 0;
+
+              case 18:
+                if (!(i < views.length)) {
+                  _context4.next = 44;
+                  break;
+                }
+
+                _context4.next = 21;
+                return _detectObjects(views[i], img);
+
+              case 21:
+                objects = _context4.sent;
+                j = 0;
+
+              case 23:
+                if (!(j < objects.length)) {
+                  _context4.next = 41;
+                  break;
+                }
+
+                obj = objects[j];
+                _context4.next = 27;
+                return clientToWorld(this.page, {
+                  x: obj.x,
+                  y: obj.y
+                });
+
+              case 27:
+                p1 = _context4.sent;
+                _context4.next = 30;
+                return clientToWorld(this.page, {
+                  x: obj.x + obj.width,
+                  y: obj.y
+                });
+
+              case 30:
+                p2 = _context4.sent;
+                _context4.next = 33;
+                return clientToWorld(this.page, {
+                  x: obj.x + obj.width,
+                  y: obj.y + obj.height
+                });
+
+              case 33:
+                p3 = _context4.sent;
+                _context4.next = 36;
+                return clientToWorld(this.page, {
+                  x: obj.x,
+                  y: obj.y + obj.height
+                });
+
+              case 36:
+                p4 = _context4.sent;
+
+
+                res.push([p1, p2, p3, p4]);
+
+              case 38:
+                ++j;
+                _context4.next = 23;
+                break;
+
+              case 41:
+                ++i;
+                _context4.next = 18;
+                break;
+
+              case 44:
+
+                _fs2.default.unlink(path, function (error) {});
+
+                this.sendMessage({
+                  status: 200,
+                  id: 'detect',
+                  data: res
+                });
+
+                _context4.next = 51;
+                break;
+
+              case 48:
+                _context4.prev = 48;
+                _context4.t0 = _context4['catch'](0);
+
+
+                this.sendMessage({
+                  status: 500,
+                  id: 'detect',
+                  data: _context4.t0
+                });
+
+              case 51:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this, [[0, 48]]);
+      }));
+
+      function detectObjects(_x9, _x10) {
+        return _ref5.apply(this, arguments);
+      }
+
+      return detectObjects;
     }()
   }]);
 
