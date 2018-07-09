@@ -82,6 +82,16 @@ export default class OpenCVExtension
       socketId
     })
 
+    this.DetectCommand.on('activate', () => {
+
+      this.OBBCommand.deactivate()
+    })
+
+    this.OBBCommand.on('activate', () => {
+
+      this.DetectCommand.deactivate()
+    })
+
     this.notification.title = 'OpenCV initialized :)'
     this.notification.dismissAfter = 2000
     this.notification.status = 'success'

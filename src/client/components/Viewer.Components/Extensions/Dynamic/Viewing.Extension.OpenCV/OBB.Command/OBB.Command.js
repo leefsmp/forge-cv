@@ -47,6 +47,8 @@ export default class OBBCommand extends ViewerCommand {
         this.onCameraChange)  
 
       this.tooltip.activate()
+
+      this.emit('activate')
     })
 
     this.commandTool.on('deactivate', () => {

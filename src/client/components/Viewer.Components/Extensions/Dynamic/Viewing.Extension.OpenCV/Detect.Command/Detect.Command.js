@@ -48,6 +48,8 @@ export default class DetectCommand extends ViewerCommand {
 
       this.tooltip.activate()
 
+      this.emit('activate')
+
       this.timerId = 0
 
       this.detect()
