@@ -226,8 +226,6 @@ export default class Worker {
     
     } catch (ex) {
   
-      console.log(ex)
-      
       browser.close()
 
       this.sendMessage({

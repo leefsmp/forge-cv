@@ -57,11 +57,11 @@ const config = {
     viewer: {
       viewer3D: 'https://developer.api.autodesk.com/derivativeservice/v2/viewers/viewer3D.min.js?v=5.0',
       style:    'https://developer.api.autodesk.com/derivativeservice/v2/viewers/style.min.css?v=5.0'
-    },
-
-    worker: {
-      viewerUrl: null
     }
+  },
+
+  worker: {
+    viewerUrl: null
   }
 }
 
