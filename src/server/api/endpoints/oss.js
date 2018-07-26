@@ -1,7 +1,6 @@
 
 import ServiceManager from '../services/SvcManager'
 import express from 'express'
-import config from 'c0nfig'
 import path from 'path'
 import fs from 'fs'
 

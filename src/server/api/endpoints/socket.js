@@ -1,6 +1,5 @@
 
 import ServiceManager from '../services/SvcManager'
-import { serverConfig as config } from 'c0nfig'
 import express from 'express'
 
 module.exports = function() {
